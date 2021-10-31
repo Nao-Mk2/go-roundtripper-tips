@@ -6,6 +6,7 @@ import (
 
 	"github.com/Nao-Mk2/go-roundtripper-tips/logging"
 	"github.com/Nao-Mk2/go-roundtripper-tips/mocking"
+	"github.com/Nao-Mk2/go-roundtripper-tips/retrying"
 )
 
 func main() {
@@ -25,4 +26,16 @@ func main() {
 	// 2021/11/13 00:00:00 200 OK
 	//   or
 	// 2021/11/13 00:00:00 503 Service Unavailable
+
+	// Retrying
+	rc := &http.Client{
+		Transport: &retrying.RetryingTransport{
+			Transport: &logging.LoggingTransport{
+				Transport: &mocking.MockingTransport{},
+			},
+		},
+	}
+	rc.Get("https://example.com")
+	// 2021/11/13 00:00:00 503 Service Unavailable
+	// 2021/11/13 00:00:01 200 OK
 }
