@@ -16,13 +16,18 @@ func (t *LoggingTransport) transport() http.RoundTripper {
 	return http.DefaultTransport
 }
 
-func (t *LoggingTransport) RoundTrip(req *http.Request) (res *http.Response, err error) {
-	res, err = t.transport().RoundTrip(req)
+func (t *LoggingTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	res, err := t.transport().RoundTrip(req)
 
 	if err == nil {
-		log.Printf("%s %s %d %s", req.Method, req.URL.String(), res.StatusCode, http.StatusText(res.StatusCode))
-	} else {
-		log.Printf("%s %s %s", req.Method, req.URL.String(), err.Error())
+		// 2021/11/11 00:00:00 GET https://example.com 200 OK
+		log.Printf(
+			"%s %s %d %s",
+			req.Method,
+			req.URL.String(),
+			res.StatusCode,
+			http.StatusText(res.StatusCode),
+		)
 	}
 
 	return res, err

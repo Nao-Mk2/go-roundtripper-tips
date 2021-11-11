@@ -16,13 +16,13 @@ func (t *RetryingTransport) transport() http.RoundTripper {
 	return http.DefaultTransport
 }
 
-func (t *RetryingTransport) RoundTrip(req *http.Request) (res *http.Response, err error) {
-	res, err = t.transport().RoundTrip(req)
+func (t *RetryingTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	res, err := t.transport().RoundTrip(req)
 
 	if err == nil {
-		if res.StatusCode/100 == 5 {
+		if res.StatusCode == 503 {
 			time.Sleep(1 * time.Second)
-			// retry simply once.
+			// retry once.
 			res, err = t.transport().RoundTrip(req)
 		}
 	}
